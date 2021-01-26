@@ -1,5 +1,13 @@
 let searchCityFormId = document.querySelector( "#search-city" );
 let searchCityInput = document.querySelector( "#search-city-input" );
+let noDataMessage = document.querySelector( "#no-result-message" );
+let currentWeatherBox = document.querySelector( "#current-weather-box" );
+let forecastBox = document.querySelector( "#forecast-box" );
+let weatherBoxBody = document.querySelector( "#weather-box-body" );
+let forecastBoxBody = document.querySelector( "#forecast-box-body" );
+
+let apiKey = "3628922a688c509fc920e765d69eb863";
+let apiUrl = "http://api.openweathermap.org/data/2.5/";
 
 //////////////////////////
 
@@ -9,9 +17,39 @@ let showLastCitySearch = function() {
 
 //////////////////////////
 
+let searchForCurrentWeather = function( searchCity ) {
+   console.log( "searchForCurrentWeather fn: " + searchCity );
+
+   let currentWeatherUrl = apiUrl + "weather?q=" + searchCity + "&units=imperial&APPID=" + apiKey;
+   console.log( currentWeatherUrl );
+};
+
+//////////////////////////
+
 let weatherSearchHandler = function( searchCity ) {
    console.log( "weatherSearchHandler fn: " + searchCity );
+
+   // Hide the no-data-available message
+   noDataMessage.classList.add( "hide" );
+
+   // Hide the current weather box until it is time to display
+   currentWeatherBox.classList.add( "hide" );
+
+   // Hide the forecast box until it is time to display
+   forecastBox.classList.add( "hide" );
+
+   // Clear the data from the current weather box area
+   weatherBoxBody.textContent = "";
+
+   // Clear the data from the forecast box area
+   forecastBoxBody.textContent = "";
+
+   // Housecleaning done, now call the search function to fetch data
+   searchForCurrentWeather( searchCity );
+
 };
+
+//////////////////////////
 
 let addCityToSearchHistory = function( searchCity ) {
    console.log( "addCityToSearchHistory fn: " + searchCity );
