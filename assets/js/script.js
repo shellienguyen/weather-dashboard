@@ -17,11 +17,44 @@ let showLastCitySearch = function() {
 
 //////////////////////////
 
-let searchForCurrentWeather = function( searchCity ) {
+let displayCurrentWeather = function( data ) {
+   console.log( "displayCurrentWeather fn" );
+};
+
+//////////////////////////
+
+let displayUVData = function( cityLatLon ) {
+   console.log( "displayUVData fn Lat/Lon: " + cityLatLon );
+};
+
+//////////////////////////
+
+let fetchCurrentWeather = function( searchCity ) {
    console.log( "searchForCurrentWeather fn: " + searchCity );
 
    let currentWeatherUrl = apiUrl + "weather?q=" + searchCity + "&units=imperial&APPID=" + apiKey;
    console.log( currentWeatherUrl );
+
+   fetch( currentWeatherUrl ).then( function( response ) {
+      if ( response.ok ) {
+         response.json().then( function( data ) {
+            console.log( "" );
+            console.log( "fetched data: " );
+            console.log( data );
+
+            // Display the currently fetched weather
+            displayCurrentWeather( data );
+
+           // Display the currently fetched UV data
+           let cityLatLon = data.coord;
+           displayUVData( cityLatLon );
+         });
+      }
+      else {
+         console.log( "Fetch error!" );
+         //$( "#no-result-message" ).show();
+      };
+   });
 };
 
 //////////////////////////
@@ -45,7 +78,7 @@ let weatherSearchHandler = function( searchCity ) {
    forecastBoxBody.textContent = "";
 
    // Housecleaning done, now call the search function to fetch data
-   searchForCurrentWeather( searchCity );
+   fetchCurrentWeather( searchCity );
 
 };
 
@@ -58,7 +91,7 @@ let addCityToSearchHistory = function( searchCity ) {
 //////////////////////////
 
 let formSearchHandler = function( event ) {
-   /* Prevetns the browser from sending the form's input data to a URL
+   /* Prevent the browser from sending the form's input data to a URL
       as we will handle what happens with the form input data ourselves */
    event.preventDefault();
 
