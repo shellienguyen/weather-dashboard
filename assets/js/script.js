@@ -23,9 +23,11 @@ let fetchAndDisplayUvi = function( cityLatLon ) {
    let searchLatLon = "lat=" + cityLatLon.lat + "&lon=" + cityLatLon.lon;
    let uviUrl = apiUrl + "onecall?" + searchLatLon + "&appid=" + apiKey;
 
-   // Send search city name to the API to fetch current UVI data
-   //    If fetch is a success, parse and display UVI data
-   //    If fetch fails, perform error handing
+   /*
+   Send search city name to the API to fetch current UVI data
+      If fetch is a success, parse and display UVI data
+      If fetch fails, perform error handing
+   */
    fetch( uviUrl ). then( function( response ) {
       if( response.ok ) {
          response.json().then( function( fetchedUvi ) {
@@ -108,15 +110,17 @@ let displayCurrentWeather = function( fetchedData ) {
 
 //////////////////////////
 
-let fetchCurrentWeather = function( searchCity ) {
+let fetchAndDisplayCurrentWeather = function( searchCity ) {
    console.log( "searchForCurrentWeather fn: " + searchCity );
 
    let currentWeatherUrl = apiUrl + "weather?q=" + searchCity + "&units=imperial&APPID=" + apiKey;
    console.log( currentWeatherUrl );
 
-   // Send search city name to the API to fetch current weather data
-   //    If fetch is a success, call displayCurrentWeather function to parse and display data
-   //    if fetch fails, perform error handing
+   /*
+   Send search city name to the API to fetch current weather data
+      If fetch is a success, call displayCurrentWeather function to parse and display data
+      If fetch fails, perform error handing
+   */
    fetch( currentWeatherUrl ).then( function( response ) {
       if ( response.ok ) {
          response.json().then( function( fetchedData ) {
@@ -131,6 +135,95 @@ let fetchCurrentWeather = function( searchCity ) {
       else {
          console.log( "Fetch weather data error!" );
          //$( "#no-result-message" ).show();
+      };
+   });
+};
+
+//////////////////////////
+
+let displayForecastWeather = function( fetchedForecastData ) {
+   console.log( "displayForecastWeather fn, forecast count: " + fetchedForecastData.cnt );
+
+   // Loop through the number of forecast days to display one all 5 forecasts one by one
+   for ( let i = 0; i < fetchedForecastData.cnt; i ++) {
+
+      /*
+      There is one forecast for every 3 hours, hence 8 forecasts a day
+      Grab the daily mid-day forecast and set that to be the daily forecast
+      Create all display elements dynamically
+      */
+      let forecastDate = moment( fetchedForecastData.list[ i ].dt_txt );
+      if ( parseInt( forecastDate.format( "HH" )) == 12 ) {
+         console.log( "Hour: " + forecastDate.format( "HH" ) );
+
+         // Create the <div> box to hold each forecast
+         let eachForecastBox = document.createElement( "div" );
+         eachForecastBox.classList.add( "card", "bg-primary", "col-10", "col-lg-2", "p-0", "mx-auto", "mt-3" );
+
+         // Create the <div> body to hold each forecast
+         let eachForecastBody = document.createElement( "div" );
+         eachForecastBody.classList.add( "card-body", "text-light", "p-2" );
+
+         // Forecast header is the forecast date
+         let forecastHeader = document.createElement( "h5" );
+         forecastHeader.classList.add( "card-title" );
+         forecastDate = forecastDate.format( "MM/DD/YYYY" );
+         forecastHeader.textContent = forecastDate
+         console.log( "Forecast iteration #" + ( i + 1 ) + ": " + forecastDate );
+
+         // Grab the weather icon
+         let forecastIcon = document.createElement( "img" );
+         forecastIcon.setAttribute( "src", "https://openweathermap.org/img/w/" + fetchedForecastData.list[ i ].weather[ 0 ].icon + ".png" );
+         forecastIcon.setAttribute( "alt", fetchedForecastData.list[ i ].weather[ 0 ].main + " - " + fetchedForecastData.list[ i ].weather[ 0 ].description );
+         console.log( "src: https://openweathermap.org/img/w/" + fetchedForecastData.list[ i ].weather[ 0 ].icon + ".png" );
+         console.log( "alt: " + fetchedForecastData.list[ i ].weather[ 0 ].main + " - " + fetchedForecastData.list[ i ].weather[ 0 ].description );
+
+         // Display the temperature
+         let forecastTemp = document.createElement( "div" );
+         forecastTemp.textContent = "Temp: " + fetchedForecastData.list[ i ].main.temp + " °F";
+         console.log( "Temp: " + fetchedForecastData.list[ i ].main.temp + " °F" );
+
+         // Display the humidity
+         let forecastHumidity = document.createElement( "div" );
+         forecastHumidity.textContent = "Humidity: " + fetchedForecastData.list[ i ].main.humidity + "%";
+         console.log( "Humidity: " + fetchedForecastData.list[ i ].main.humidity + "%" );
+
+         // Append all elements to the forecast box body
+         eachForecastBody.appendChild( forecastHeader );
+         eachForecastBody.appendChild( forecastIcon );
+         eachForecastBody.appendChild( forecastTemp );
+         eachForecastBody.appendChild( forecastHumidity );
+
+         // Append the forecast box body to the forecast box
+         eachForecastBox.appendChild( eachForecastBody );
+
+         // Append each day's forecast box to the 5-day forecast box
+         forecastBoxBody.appendChild( eachForecastBox );
+      };
+   };
+
+   forecastBox.classList.remove( "hide" );
+};
+
+//////////////////////////
+
+let fetchAndDisplayFiveDayForecast = function( searchCity ) {
+   console.log( "fetchAndDisplayFiveDayForecast fn: " + searchCity );
+   let forecastUrl = apiUrl + "forecast?q=" + searchCity + "&units=imperial&appid=" + apiKey;
+
+   fetch( forecastUrl ).then( function( response ) {
+      if ( response.ok ) {
+         response.json().then( function( fetchedForecastData ) {
+            console.log( "" );
+            console.log( "fetched forecast data: " );
+            console.log( fetchedForecastData );
+
+            // Call function to display the 5-Day forecast data
+            displayForecastWeather( fetchedForecastData );
+         });
+      }
+      else {
+         console.log( "Fetch forecase weather data error!" );
       };
    });
 };
@@ -155,8 +248,11 @@ let weatherSearchHandler = function( searchCity ) {
    // Clear the data from the forecast box area
    forecastBoxBody.textContent = "";
 
-   // Housecleaning done, now call the search function to fetch data
-   fetchCurrentWeather( searchCity );
+   // Housecleaning done, now call the search function to fetch and display current weather data
+   fetchAndDisplayCurrentWeather( searchCity );
+
+   // Call function to fetch and display 5-day forecast
+   fetchAndDisplayFiveDayForecast( searchCity );
 };
 
 //////////////////////////
@@ -168,8 +264,10 @@ let addCityToSearchHistory = function( searchCity ) {
 //////////////////////////
 
 let formSearchHandler = function( event ) {
-   /* Prevent the browser from sending the form's input data to a URL
-      as we will handle what happens with the form input data ourselves */
+   /*
+   Prevent the browser from sending the form's input data to a URL
+   as we will handle what happens with the form input data ourselves
+   */
    event.preventDefault();
 
    let searchCity = searchCityInput.value.trim();
