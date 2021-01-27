@@ -17,14 +17,93 @@ let showLastCitySearch = function() {
 
 //////////////////////////
 
-let displayCurrentWeather = function( data ) {
-   console.log( "displayCurrentWeather fn" );
+let fetchAndDisplayUvi = function( cityLatLon ) {
+   console.log( "fetchAndDisplayUvi fn Lat/Lon: " + cityLatLon );
+
+   let searchLatLon = "lat=" + cityLatLon.lat + "&lon=" + cityLatLon.lon;
+   let uviUrl = apiUrl + "onecall?" + searchLatLon + "&appid=" + apiKey;
+
+   // Send search city name to the API to fetch current UVI data
+   //    If fetch is a success, parse and display UVI data
+   //    If fetch fails, perform error handing
+   fetch( uviUrl ). then( function( response ) {
+      if( response.ok ) {
+         response.json().then( function( fetchedUvi ) {
+            console.log();
+            console.log( "fetchedUvi: " );
+            console.log( fetchedUvi );
+
+            // Dynamically create the <div> to hold the UV info
+            let uviData = document.createElement( "div" );
+            uviData.textContent = "UV Index: " + ( fetchedUvi.current.uvi );
+            weatherBoxBody.appendChild( uviData );
+         });
+      }
+      else {
+         console.log( "Fetch UVI error!" );
+      };
+   });
 };
 
 //////////////////////////
 
-let displayUVData = function( cityLatLon ) {
-   console.log( "displayUVData fn Lat/Lon: " + cityLatLon );
+let displayCurrentWeather = function( fetchedData ) {
+   console.log( "displayCurrentWeather fn" );
+
+   // Dynamically create a <h1> tag to display the city name, date, and weather icon
+   let currentWeatherHeader = document.createElement( "h1" );
+
+   // Extract today's date
+   let currentTime = moment();
+   let today = "(" + currentTime.format( "MM/DD/YYYY" ) + ")";
+   console.log( "today: " + today );
+   console.log( "fetchedData.name: " + fetchedData.name );
+
+   // Assign the <h1> textcontent to be the city name and today's date
+   currentWeatherHeader.textContent = fetchedData.name + " " + today;
+
+   // Dynamically create the <img> element and get the weather icon
+   let weatherIcon = document.createElement( "img" )
+   weatherIcon.setAttribute( "src", "https://openweathermap.org/img/w/" + fetchedData.weather[ 0 ].icon + ".png" );
+   weatherIcon.setAttribute( "alt", fetchedData.weather[ 0 ].main + " - " + fetchedData.weather[ 0 ].description );
+   console.log( "ICON" );
+   console.log( "src", "https://openweathermap.org/img/w/" + fetchedData.weather[ 0 ].icon + ".png" );
+   console.log( "alt", fetchedData.weather[ 0 ].main + " - " + fetchedData.weather[ 0 ].description );
+
+   // Dynamically create the <div> element to display the temperature in
+   let currentTemp = document.createElement( "div" );
+   currentTemp.textContent = "Temperature: " + ( fetchedData.main.temp ) + " °F";
+   console.log( "Temperature: " + ( fetchedData.main.temp ) + " F°" );
+
+   // Dynamically create the <div> element to display the humidity in
+   let currentHumidity = document.createElement( "div" );
+   currentHumidity.textContent = "Humidity: " + ( fetchedData.main.humidity ) + "%";
+   console.log( "Humidity: " + ( fetchedData.main.humidity) + "%" );
+
+   // Dynamically create the <div> element to display the wind speed in
+   let currentWindSpeed = document.createElement( "div" );
+   currentWindSpeed.textContent = "Wind Speed: " + ( fetchedData.wind.speed ) + "MPH" ;
+   console.log( "Wind Speed: " + ( fetchedData.wind.speed ) + "MPH" );
+
+   // Display the UV Index
+
+   // Append the icon to the header
+   currentWeatherHeader.appendChild( weatherIcon );
+
+   // Append all the new and dynamically created elements to the weather body box
+   weatherBoxBody.appendChild( currentWeatherHeader );
+   weatherBoxBody.appendChild( currentTemp );
+   weatherBoxBody.appendChild( currentHumidity );
+   weatherBoxBody.appendChild( currentWindSpeed );
+
+   currentWeatherBox.appendChild( weatherBoxBody );
+
+   // The current weather box was hidden on page load, remove the "hide" attribute now that we have data to display
+   currentWeatherBox.removeAttribute( "class", "hide" );
+
+   // Display the currently fetched UV data
+   let cityLatLon = fetchedData.coord;
+   fetchAndDisplayUvi( cityLatLon );
 };
 
 //////////////////////////
@@ -35,23 +114,22 @@ let fetchCurrentWeather = function( searchCity ) {
    let currentWeatherUrl = apiUrl + "weather?q=" + searchCity + "&units=imperial&APPID=" + apiKey;
    console.log( currentWeatherUrl );
 
+   // Send search city name to the API to fetch current weather data
+   //    If fetch is a success, call displayCurrentWeather function to parse and display data
+   //    if fetch fails, perform error handing
    fetch( currentWeatherUrl ).then( function( response ) {
       if ( response.ok ) {
-         response.json().then( function( data ) {
+         response.json().then( function( fetchedData ) {
             console.log( "" );
             console.log( "fetched data: " );
-            console.log( data );
+            console.log( fetchedData );
 
             // Display the currently fetched weather
-            displayCurrentWeather( data );
-
-           // Display the currently fetched UV data
-           let cityLatLon = data.coord;
-           displayUVData( cityLatLon );
+            displayCurrentWeather( fetchedData );
          });
       }
       else {
-         console.log( "Fetch error!" );
+         console.log( "Fetch weather data error!" );
          //$( "#no-result-message" ).show();
       };
    });
@@ -79,7 +157,6 @@ let weatherSearchHandler = function( searchCity ) {
 
    // Housecleaning done, now call the search function to fetch data
    fetchCurrentWeather( searchCity );
-
 };
 
 //////////////////////////
