@@ -5,6 +5,10 @@ let currentWeatherBox = document.querySelector( "#current-weather-box" );
 let forecastBox = document.querySelector( "#forecast-box" );
 let weatherBoxBody = document.querySelector( "#weather-box-body" );
 let forecastBoxBody = document.querySelector( "#forecast-box-body" );
+let searchHistoryList = document.querySelector( "#search-history" );
+//let historySearchBox = document.querySelector( "search-history-box" )
+
+let searchHistoryArr = [];
 
 let apiKey = "3628922a688c509fc920e765d69eb863";
 let apiUrl = "http://api.openweathermap.org/data/2.5/";
@@ -18,7 +22,6 @@ let showLastCitySearch = function() {
 //////////////////////////
 
 let fetchAndDisplayUvi = function( cityLatLon ) {
-   console.log( "fetchAndDisplayUvi fn Lat/Lon: " + cityLatLon );
 
    let searchLatLon = "lat=" + cityLatLon.lat + "&lon=" + cityLatLon.lon;
    let uviUrl = apiUrl + "onecall?" + searchLatLon + "&appid=" + apiKey;
@@ -50,7 +53,6 @@ let fetchAndDisplayUvi = function( cityLatLon ) {
 //////////////////////////
 
 let displayCurrentWeather = function( fetchedData ) {
-   console.log( "displayCurrentWeather fn" );
 
    // Dynamically create a <h1> tag to display the city name, date, and weather icon
    let currentWeatherHeader = document.createElement( "h1" );
@@ -58,8 +60,6 @@ let displayCurrentWeather = function( fetchedData ) {
    // Extract today's date
    let currentTime = moment();
    let today = "(" + currentTime.format( "MM/DD/YYYY" ) + ")";
-   console.log( "today: " + today );
-   console.log( "fetchedData.name: " + fetchedData.name );
 
    // Assign the <h1> textcontent to be the city name and today's date
    currentWeatherHeader.textContent = fetchedData.name + " " + today;
@@ -68,25 +68,19 @@ let displayCurrentWeather = function( fetchedData ) {
    let weatherIcon = document.createElement( "img" )
    weatherIcon.setAttribute( "src", "https://openweathermap.org/img/w/" + fetchedData.weather[ 0 ].icon + ".png" );
    weatherIcon.setAttribute( "alt", fetchedData.weather[ 0 ].main + " - " + fetchedData.weather[ 0 ].description );
-   console.log( "ICON" );
-   console.log( "src", "https://openweathermap.org/img/w/" + fetchedData.weather[ 0 ].icon + ".png" );
-   console.log( "alt", fetchedData.weather[ 0 ].main + " - " + fetchedData.weather[ 0 ].description );
-
+  
    // Dynamically create the <div> element to display the temperature in
    let currentTemp = document.createElement( "div" );
    currentTemp.textContent = "Temperature: " + ( fetchedData.main.temp ) + " °F";
-   console.log( "Temperature: " + ( fetchedData.main.temp ) + " F°" );
-
+  
    // Dynamically create the <div> element to display the humidity in
    let currentHumidity = document.createElement( "div" );
    currentHumidity.textContent = "Humidity: " + ( fetchedData.main.humidity ) + "%";
-   console.log( "Humidity: " + ( fetchedData.main.humidity) + "%" );
 
    // Dynamically create the <div> element to display the wind speed in
    let currentWindSpeed = document.createElement( "div" );
    currentWindSpeed.textContent = "Wind Speed: " + ( fetchedData.wind.speed ) + "MPH" ;
-   console.log( "Wind Speed: " + ( fetchedData.wind.speed ) + "MPH" );
-
+  
    // Display the UV Index
 
    // Append the icon to the header
@@ -111,10 +105,8 @@ let displayCurrentWeather = function( fetchedData ) {
 //////////////////////////
 
 let fetchAndDisplayCurrentWeather = function( searchCity ) {
-   console.log( "searchForCurrentWeather fn: " + searchCity );
 
    let currentWeatherUrl = apiUrl + "weather?q=" + searchCity + "&units=imperial&APPID=" + apiKey;
-   console.log( currentWeatherUrl );
 
    /*
    Send search city name to the API to fetch current weather data
@@ -142,7 +134,6 @@ let fetchAndDisplayCurrentWeather = function( searchCity ) {
 //////////////////////////
 
 let displayForecastWeather = function( fetchedForecastData ) {
-   console.log( "displayForecastWeather fn, forecast count: " + fetchedForecastData.cnt );
 
    // Loop through the number of forecast days to display one all 5 forecasts one by one
    for ( let i = 0; i < fetchedForecastData.cnt; i ++) {
@@ -154,7 +145,6 @@ let displayForecastWeather = function( fetchedForecastData ) {
       */
       let forecastDate = moment( fetchedForecastData.list[ i ].dt_txt );
       if ( parseInt( forecastDate.format( "HH" )) == 12 ) {
-         console.log( "Hour: " + forecastDate.format( "HH" ) );
 
          // Create the <div> box to hold each forecast
          let eachForecastBox = document.createElement( "div" );
@@ -169,24 +159,19 @@ let displayForecastWeather = function( fetchedForecastData ) {
          forecastHeader.classList.add( "card-title" );
          forecastDate = forecastDate.format( "MM/DD/YYYY" );
          forecastHeader.textContent = forecastDate
-         console.log( "Forecast iteration #" + ( i + 1 ) + ": " + forecastDate );
 
          // Grab the weather icon
          let forecastIcon = document.createElement( "img" );
          forecastIcon.setAttribute( "src", "https://openweathermap.org/img/w/" + fetchedForecastData.list[ i ].weather[ 0 ].icon + ".png" );
          forecastIcon.setAttribute( "alt", fetchedForecastData.list[ i ].weather[ 0 ].main + " - " + fetchedForecastData.list[ i ].weather[ 0 ].description );
-         console.log( "src: https://openweathermap.org/img/w/" + fetchedForecastData.list[ i ].weather[ 0 ].icon + ".png" );
-         console.log( "alt: " + fetchedForecastData.list[ i ].weather[ 0 ].main + " - " + fetchedForecastData.list[ i ].weather[ 0 ].description );
 
          // Display the temperature
          let forecastTemp = document.createElement( "div" );
          forecastTemp.textContent = "Temp: " + fetchedForecastData.list[ i ].main.temp + " °F";
-         console.log( "Temp: " + fetchedForecastData.list[ i ].main.temp + " °F" );
 
-         // Display the humidity
+         // Display the humidity level
          let forecastHumidity = document.createElement( "div" );
          forecastHumidity.textContent = "Humidity: " + fetchedForecastData.list[ i ].main.humidity + "%";
-         console.log( "Humidity: " + fetchedForecastData.list[ i ].main.humidity + "%" );
 
          // Append all elements to the forecast box body
          eachForecastBody.appendChild( forecastHeader );
@@ -208,7 +193,7 @@ let displayForecastWeather = function( fetchedForecastData ) {
 //////////////////////////
 
 let fetchAndDisplayFiveDayForecast = function( searchCity ) {
-   console.log( "fetchAndDisplayFiveDayForecast fn: " + searchCity );
+
    let forecastUrl = apiUrl + "forecast?q=" + searchCity + "&units=imperial&appid=" + apiKey;
 
    fetch( forecastUrl ).then( function( response ) {
@@ -231,7 +216,6 @@ let fetchAndDisplayFiveDayForecast = function( searchCity ) {
 //////////////////////////
 
 let weatherSearchHandler = function( searchCity ) {
-   console.log( "weatherSearchHandler fn: " + searchCity );
 
    // Hide the no-data-available message
    noDataMessage.classList.add( "hide" );
@@ -257,8 +241,59 @@ let weatherSearchHandler = function( searchCity ) {
 
 //////////////////////////
 
+let updateHistoryDisplay = function() {
+   console.log( "updateHistoryDisplay fn " );
+
+   // Clear the search history display
+   searchHistoryList.textContent = ""
+
+   searchHistoryArr = JSON.parse( localStorage.getItem( "searchHistory" ));
+
+   /* 
+   Display the list of city search history in descending order from the latest
+   to the oldest, hence display the array backward, starting from the last item
+   in the array up to the first
+   */
+   let displayCount = 1;
+   for ( let i = searchHistoryArr.length -1; i >= 0; i-- ) {
+      let historySearchItem = document.createElement( "li" );
+
+      historySearchItem.textContent = displayCount + ".) " + searchHistoryArr[ i ];
+      historySearchItem.classList.add( "list-group-item" );
+      historySearchItem.setAttribute( "data-history-value", searchHistoryArr[ i ] );
+
+      searchHistoryList.appendChild( historySearchItem );
+
+      displayCount++;
+   };
+
+   //searchHistoryList.remove( "hide" );
+};
+
+//////////////////////////
+
 let addCityToSearchHistory = function( searchCity ) {
-   console.log( "addCityToSearchHistory fn: " + searchCity );
+
+   // If city search list avaiable in localStorage, get it
+   if ( localStorage.getItem( "searchHistory" )) {
+      searchHistoryArr = JSON.parse( localStorage.getItem( "searchHistory" ));
+   };
+
+   // Add the recently searched city to the searchHistoryArr array
+   searchHistoryArr.push( searchCity );
+
+   console.log( "searchHistoryArr: " + searchHistoryArr );
+
+   // Store up to 10 cities in the searchHistoryArr array, remove the oldest city otherwise
+   if (searchHistoryArr.length > 10 ) {
+      searchHistoryArr.shift();
+   };
+
+   // Store the updated searchHistoryArr into localStorage
+   localStorage.setItem( "searchHistory", JSON.stringify( searchHistoryArr ));
+
+   // Refresh the list of search history on the web page
+   updateHistoryDisplay();
 };
 
 //////////////////////////
