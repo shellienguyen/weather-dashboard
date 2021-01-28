@@ -6,7 +6,6 @@ let forecastBox = document.querySelector( "#forecast-box" );
 let weatherBoxBody = document.querySelector( "#weather-box-body" );
 let forecastBoxBody = document.querySelector( "#forecast-box-body" );
 let searchHistoryList = document.querySelector( "#search-history" );
-//let historySearchBox = document.querySelector( "search-history-box" )
 
 let searchHistoryArr = [];
 
@@ -81,8 +80,6 @@ let displayCurrentWeather = function( fetchedData ) {
    let currentWindSpeed = document.createElement( "div" );
    currentWindSpeed.textContent = "Wind Speed: " + ( fetchedData.wind.speed ) + "MPH" ;
   
-   // Display the UV Index
-
    // Append the icon to the header
    currentWeatherHeader.appendChild( weatherIcon );
 
@@ -125,8 +122,8 @@ let fetchAndDisplayCurrentWeather = function( searchCity ) {
          });
       }
       else {
-         console.log( "Fetch weather data error!" );
-         //$( "#no-result-message" ).show();
+         document.querySelector( "#current-weather-box" ).classList.remove( "hide" );
+         document.querySelector( "#no-result-message" ).classList.remove( "hide" );
       };
    });
 };
@@ -208,7 +205,7 @@ let fetchAndDisplayFiveDayForecast = function( searchCity ) {
          });
       }
       else {
-         console.log( "Fetch forecase weather data error!" );
+         console.log( "Fetch forecast weather data error!" );
       };
    });
 };
@@ -242,11 +239,11 @@ let weatherSearchHandler = function( searchCity ) {
 //////////////////////////
 
 let updateHistoryDisplay = function() {
-   console.log( "updateHistoryDisplay fn " );
 
    // Clear the search history display
    searchHistoryList.textContent = ""
 
+   // Grab and parse the searchHistoryArr from localStorage
    searchHistoryArr = JSON.parse( localStorage.getItem( "searchHistory" ));
 
    /* 
@@ -266,8 +263,6 @@ let updateHistoryDisplay = function() {
 
       displayCount++;
    };
-
-   //searchHistoryList.remove( "hide" );
 };
 
 //////////////////////////
@@ -282,6 +277,7 @@ let addCityToSearchHistory = function( searchCity ) {
    // Add the recently searched city to the searchHistoryArr array
    searchHistoryArr.push( searchCity );
 
+   console.log( "" );
    console.log( "searchHistoryArr: " + searchHistoryArr );
 
    // Store up to 10 cities in the searchHistoryArr array, remove the oldest city otherwise
@@ -311,8 +307,6 @@ let formSearchHandler = function( event ) {
    if( !searchCity ) {
       return false;
    }
-
-   console.log( "searchCity: " + searchCity );
 
    // If there is an input, send it to go fetch weather data
    weatherSearchHandler( searchCity );
