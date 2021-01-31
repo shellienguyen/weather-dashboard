@@ -37,10 +37,52 @@ let fetchAndDisplayUvi = function( cityLatLon ) {
             console.log( "fetchedUvi: " );
             console.log( fetchedUvi );
 
-            // Dynamically create the <div> to hold the UV info
+            // Dynamically create elements to hold the UVI Info
+            
+            // Create the <div> container
+            let uviDataBox = document.createElement( "div" );
+            uviDataBox.classList.add( "row" );
+
+            // Create the <div> column to hold the text "UV-Index:""
+            let uviText = document.createElement( "div" );
+            uviText.classList.add( "col-md-auto");
+            uviText.textContent = "UV Index: ";
+
+            /*
+            Creat the <div> column to hold the value of the UV Index.
+            Color-code based on severity:
+               1-2 Green
+               3-5 Yellow
+               6-7 Orange
+               8-10 Red
+               11+ Purple
+            */
             let uviData = document.createElement( "div" );
-            uviData.textContent = "UV Index: " + ( fetchedUvi.current.uvi );
-            weatherBoxBody.appendChild( uviData );
+            uviData.classList.add( "col-md-auto", "rounded", "text-left" );
+            if ( fetchedUvi.current.uvi < 3 ) {
+               uviData.classList.add( "bg-success" );
+            }
+            else if ( fetchedUvi.current.uvi >= 3 && fetchedUvi.current.uvi < 6 ) {
+               uviData.classList.add( "yellow" );
+            }
+            else if (fetchedUvi.current.uvi >= 6 && fetchedUvi.current.uvi < 8 ) {
+               uviData.classList.add( "orange" );
+            }
+            else if ( fetchedUvi.current.uvi >= 8 && fetchedUvi.current.uvi < 11 ) {
+               uviData.classList.add( "bg-danger" );
+            }
+            else {
+               uviData.classList.add( "purple" );
+            };
+            uviData.textContent =  fetchedUvi.current.uvi;
+            
+            let uviBlankBox = document.createElement( "div" );
+            uviBlankBox.classList.add( "col" );
+
+            uviDataBox.appendChild( uviText );
+            uviDataBox.appendChild( uviData );
+            uviDataBox.appendChild( uviBlankBox );
+            weatherBoxBody.appendChild( uviDataBox );
          });
       }
       else {
