@@ -49,8 +49,8 @@ let fetchAndDisplayUvi = function( cityLatLon ) {
             uviText.textContent = "UV Index: ";
 
             /*
-            Creat the <div> column to hold the value of the UV Index.
-            Color-code based on severity:
+            Create the <div> column to hold the value of the UV Index.
+            Color-code the UVI value box base on UVI severity:
                1-2 Green
                3-5 Yellow
                6-7 Orange

@@ -13,3 +13,17 @@
 .purple {
    background-color: purple;
 }
+
+ /* Do Not display search history on a small screen */
+ @media only screen and (max-width: 767px){
+   #search-history-box {
+     display: none!important;
+   }
+ }
+ 
+ /* Set the search box to be max width on mobile */
+ @media only screen and (min-width: 768px){
+   #search-div {
+     min-height: 100vh;
+   }
+ }
