@@ -16,6 +16,12 @@ let apiUrl = "http://api.openweathermap.org/data/2.5/";
 
 let showLastCitySearch = function() {
    console.log( "showLastCitySearch fn" );
+   
+   // If we have data in localStorage, display the last searched city
+   if ( localStorage.getItem( "searchHistory" )) {
+      updateHistoryDisplay();
+      weatherSearchHandler( searchHistoryArr[ searchHistoryArr.length - 1 ]);
+   };
 };
 
 //////////////////////////
@@ -362,7 +368,7 @@ let formSearchHandler = function( event ) {
 
 //////////////////////////
 
-// When the page loads, display the weather data for the last searched city
+// When the page loads, display the weather data for the last searched city, if available
 showLastCitySearch()
 
 // Listen for search submit event, when the user clicks on the search button
@@ -382,4 +388,4 @@ searchHistoryList.addEventListener( "click", function( event ){
      weatherSearchHandler( clickedHistoryCity );
      addCityToSearchHistory( clickedHistoryCity );
    };
- });
+});
