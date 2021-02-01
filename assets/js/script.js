@@ -10,7 +10,7 @@ let searchHistoryList = document.querySelector( "#search-history" );
 let searchHistoryArr = [];
 
 let apiKey = "3628922a688c509fc920e765d69eb863";
-let apiUrl = "http://api.openweathermap.org/data/2.5/";
+let apiUrl = "https://api.openweathermap.org/data/2.5/";
 
 //////////////////////////
 
