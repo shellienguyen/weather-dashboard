@@ -13,6 +13,14 @@
 .purple {
    background-color: purple;
 }
+ 
+li:hover{
+   background-color:#dbdddd;
+ }
+ 
+li:active{
+   background-color: lightgray;
+}
 
  /* Do Not display search history on a small screen */
  @media only screen and (max-width: 767px){

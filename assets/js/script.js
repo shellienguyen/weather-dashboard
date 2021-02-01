@@ -367,3 +367,19 @@ showLastCitySearch()
 
 // Listen for search submit event, when the user clicks on the search button
 searchCityFormId.addEventListener( "click", formSearchHandler );
+
+// If the user clicks on a city from the search history list
+searchHistoryList.addEventListener( "click", function( event ){
+   /*
+   Prevent the browser from sending the form's input data to a URL
+   as we will handle what happens with the form input data ourselves
+   */
+   event.preventDefault();
+   let clickedCity = event.target;
+
+   if ( clickedCity.matches( "li" )) {
+     let clickedHistoryCity = clickedCity.getAttribute( "data-history-value" );
+     weatherSearchHandler( clickedHistoryCity );
+     addCityToSearchHistory( clickedHistoryCity );
+   };
+ });
